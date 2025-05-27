@@ -1,4 +1,3 @@
-```markdown
 <!-- Improved compatibility of back to top link -->
 <a id="readme-top"></a>
 
@@ -180,4 +179,3 @@ Distributed under the MIT License. See `LICENSE` for more information.
 [issues-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/issues
 [license-shield]: https://img.shields.io/github/license/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
 [license-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/blob/main/LICENSE
-```
