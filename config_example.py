@@ -1,0 +1,4 @@
+# config_example.py
+OPENWEATHER_API_KEY = "your_openweather_api_key"
+LATITUDE = 39.82817500000000
+LONGITUDE = -98.57948800000000
