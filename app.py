@@ -5,6 +5,8 @@ import requests
 import json
 from config import OPENWEATHER_API_KEY, LATITUDE, LONGITUDE
 
+os.makedirs("/home/benchpi/pi-dashboard/logs", exist_ok=True)
+
 app = Flask(__name__)
 
 LOG_FILE = "/home/benchpi/pi-dashboard/logs/weather_log.json"
