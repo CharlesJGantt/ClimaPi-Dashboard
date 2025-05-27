@@ -83,17 +83,20 @@ pip3 install flask requests
 ### Installation
 
 1. Clone the repo
+
 ```bash
 git clone git@github.com:CharlesJGantt/benchPi-Dashboard.git
 cd benchPi-Dashboard
 ```
 
 2. Copy the config template
+
 ```bash
 cp config_example.py config.py
 ```
 
 3. Add your OpenWeatherMap API key and location
+
 ```python
 # config.py
 OPENWEATHER_API_KEY = "your_api_key"
@@ -102,6 +105,7 @@ LONGITUDE = -81.8344
 ```
 
 4. Start the app
+
 ```bash
 python3 app.py
 ```
@@ -110,20 +114,22 @@ python3 app.py
 
 ## Usage
 
-- Visit the dashboard in your browser:
-  ```
-  http://<raspberry-pi-ip>:5000
-  ```
+Visit the dashboard at:
 
-- Charts include:
-  - 🌡 Temp, Feels Like, Humidity
-  - 💨 Wind Speed
-  - 📈 Pressure
+```
+http://<raspberry-pi-ip>:5000
+```
 
-- Weather is logged to:
-  ```
-  /home/benchpi/pi-dashboard/logs/weather_log.json
-  ```
+### Chart Tabs:
+- 🌡 Temp, Feels Like, Humidity
+- 💨 Wind Speed
+- 📈 Pressure
+
+Weather logs are stored at:
+
+```
+/home/benchpi/pi-dashboard/logs/weather_log.json
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -141,16 +147,17 @@ python3 app.py
 
 Pull requests welcome!
 
-1. Fork the repo
-2. Create a branch: `git checkout -b feature/my-feature`
-3. Commit your changes
-4. Push and open a PR
+1. Fork the repo  
+2. Create your branch (`git checkout -b feature/my-feature`)  
+3. Commit your changes  
+4. Push to GitHub  
+5. Open a pull request  
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more info.
+Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
