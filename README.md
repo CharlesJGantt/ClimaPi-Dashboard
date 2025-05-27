@@ -1,60 +1,78 @@
 ```markdown
-# 🖥️ benchPi-Dashboard
+<!-- Improved compatibility of back to top link -->
+<a id="readme-top"></a>
 
-> A lightweight, real-time dashboard for Raspberry Pi that tracks local weather, system stats, and nearby aircraft — rendered beautifully with Flask, Bootstrap, and Chart.js.
+<!-- PROJECT SHIELDS -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.9%2B-yellow)
-![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-lightgrey)
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/CharlesJGantt/benchPi-Dashboard">
+    <img src="docs/dashboard-preview.png" alt="Logo" width="100" height="100">
+  </a>
 
----
+  <h3 align="center">benchPi-Dashboard</h3>
 
-## 🌐 Live Demo
+  <p align="center">
+    A Flask-powered Raspberry Pi dashboard for real-time weather, system stats, and aircraft tracking.
+    <br />
+    <a href="https://github.com/CharlesJGantt/benchPi-Dashboard"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/CharlesJGantt/benchPi-Dashboard/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/CharlesJGantt/benchPi-Dashboard/issues">Request Feature</a>
+  </p>
+</div>
 
-> Coming soon — or host it yourself on a Pi using the instructions below!
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>📘 Table of Contents</summary>
+  <ol>
+    <li><a href="#about-the-project">About The Project</a></li>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
 
----
+## About The Project
 
-## ✨ Features
+![Product Screenshot](docs/dashboard-preview.png)
 
-- 🌦️ Real-time weather data from OpenWeatherMap
-- 💻 CPU temperature, uptime, and current timestamp
-- ✈️ ADS-B aircraft tracking via `dump1090-fa`
-- 📊 Interactive, historical charts powered by Chart.js:
-  - 🧊 Tri-Chart: Temp, Feels Like, Humidity
-  - 💨 Wind Speed
-  - 📈 Barometric Pressure
-- 🔄 Auto-refreshing every 2 minutes
-- 🔐 Secrets excluded from Git (see `.gitignore`)
-- 📁 Weather logs persist across reboots
+`benchPi-Dashboard` is a lightweight, real-time web dashboard for Raspberry Pi devices. It provides:
 
----
+- 🌦 Live weather from OpenWeatherMap
+- 💻 System stats (CPU temp, uptime, timestamp)
+- ✈️ Aircraft tracking via `dump1090-fa`
+- 📊 Historical data charts (Chart.js + Bootstrap tabs)
+- 🔐 Secure secret config and logging design
 
-## 🧰 Project Structure
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```text
-pi-dashboard/
-├── app.py               # Flask app
-├── dashboard.html       # Templated frontend (Jinja2 + Bootstrap + Chart.js)
-├── config_example.py    # Template for secrets (do not commit actual config)
-├── logs/                # Weather data history (auto-generated, ignored by Git)
-├── .gitignore
-└── README.md
-```
+## Built With
 
----
+* [Python 3.9+](https://www.python.org/)
+* [Flask](https://flask.palletsprojects.com/)
+* [Chart.js](https://www.chartjs.org/)
+* [Bootstrap 5](https://getbootstrap.com/)
+* [OpenWeatherMap API](https://openweathermap.org/)
+* [dump1090-fa](https://github.com/flightaware/dump1090)
 
-## ⚙️ Requirements
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-- ✅ Raspberry Pi (tested on Pi 4B)
-- ✅ Python 3.9+
-- ✅ Internet connection
-- ✅ OpenWeatherMap API key
-- Optional: `dump1090-fa` for aircraft tracking
+## Getting Started
 
----
-
-## 🔧 Installation
+### Prerequisites
 
 ```bash
 sudo apt update
@@ -62,103 +80,97 @@ sudo apt install python3-pip git
 pip3 install flask requests
 ```
 
-Clone this repo:
+### Installation
 
+1. Clone the repo
 ```bash
 git clone git@github.com:CharlesJGantt/benchPi-Dashboard.git
 cd benchPi-Dashboard
 ```
 
----
-
-## 🔑 Configuration
-
-1. Copy the secrets template:
-
+2. Copy the config template
 ```bash
 cp config_example.py config.py
 ```
 
-2. Edit `config.py` with your location and OpenWeatherMap API key:
-
+3. Add your OpenWeatherMap API key and location
 ```python
 # config.py
-OPENWEATHER_API_KEY = "your_api_key_here"
+OPENWEATHER_API_KEY = "your_api_key"
 LATITUDE = 33.5296
 LONGITUDE = -81.8344
 ```
 
-> 🔐 `config.py` is **ignored by Git** to prevent leaking secrets. Do not commit it.
-
----
-
-## 🚀 Launch the App
-
-From inside the repo folder:
-
+4. Start the app
 ```bash
 python3 app.py
 ```
 
-Open your browser to:
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-```
-http://<your-raspberry-pi-ip>:5000
-```
+## Usage
 
----
-
-## 📉 Charting Overview
-
-Weather data is saved to:
-
-```
-/home/benchpi/pi-dashboard/logs/weather_log.json
-```
-
-The dashboard renders this data on each refresh, showing full historical charts:
-
-| Chart Tab        | Data Included                     |
-|------------------|-----------------------------------|
-| 🌡️ Tri-Chart     | Temp, Feels Like, Humidity        |
-| 💨 Wind Speed    | Wind speed (m/s)                  |
-| 📈 Barometric    | Air pressure (hPa)                |
-
----
-
-## 🔐 Security Notes
-
-- All secrets (`config.py`) are excluded via `.gitignore`
-- If a key is accidentally pushed, rotate the key and run:
-  ```bash
-  git filter-branch --force --index-filter \
-    "git rm --cached --ignore-unmatch config.py" \
-    --prune-empty --tag-name-filter cat -- --all
-  git push origin --force
+- Visit the dashboard in your browser:
+  ```
+  http://<raspberry-pi-ip>:5000
   ```
 
----
+- Charts include:
+  - 🌡 Temp, Feels Like, Humidity
+  - 💨 Wind Speed
+  - 📈 Pressure
 
-## 🧪 Troubleshooting
+- Weather is logged to:
+  ```
+  /home/benchpi/pi-dashboard/logs/weather_log.json
+  ```
 
-- ❌ **Charts not showing?** Check that `weather_log.json` is being written to `/logs/`
-- ❌ **No weather data?** Verify your OpenWeatherMap API key works
-- ❌ **ADS-B stats empty?** Confirm `dump1090-fa` is installed and running
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
----
+## Roadmap
 
-## 📜 License
+- [x] Historical weather charting
+- [x] Secrets handling via config.py
+- [ ] Add Docker support
+- [ ] Auto-restart on crash/system reboot
+- [ ] Real-time chart updates (AJAX/WebSocket)
 
-MIT License — use it, modify it, build cool things with it.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
----
+## Contributing
 
-## 👤 Maintainer
+Pull requests welcome!
+
+1. Fork the repo
+2. Create a branch: `git checkout -b feature/my-feature`
+3. Commit your changes
+4. Push and open a PR
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more info.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Contact
 
 **Charles Gantt**  
-🔗 [charlesjgantt.com](https://charlesjgantt.com)  
-🛠 [TheMakersWorkbench](https://themakersworkbench.com)  
-🐙 [@CharlesJGantt](https://github.com/CharlesJGantt)
+📬 [charlesjgantt.com](https://charlesjgantt.com)  
+🐙 [github.com/CharlesJGantt](https://github.com/CharlesJGantt)
 
----
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & BADGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
+[contributors-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
+[forks-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/network/members
+[stars-shield]: https://img.shields.io/github/stars/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
+[stars-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/stargazers
+[issues-shield]: https://img.shields.io/github/issues/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
+[issues-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/issues
+[license-shield]: https://img.shields.io/github/license/CharlesJGantt/benchPi-Dashboard.svg?style=for-the-badge
+[license-url]: https://github.com/CharlesJGantt/benchPi-Dashboard/blob/main/LICENSE
 ```
