@@ -1,114 +1,164 @@
 ```markdown
 # 🖥️ benchPi-Dashboard
 
-A Flask-powered Raspberry Pi dashboard for monitoring real-time **weather**, **system stats**, and **ADS-B aircraft tracking** — complete with historical charting using Chart.js.
+> A lightweight, real-time dashboard for Raspberry Pi that tracks local weather, system stats, and nearby aircraft — rendered beautifully with Flask, Bootstrap, and Chart.js.
 
-![screenshot](docs/dashboard-preview.png) <!-- Optional: replace with your actual screenshot -->
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.9%2B-yellow)
+![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-lightgrey)
+
+---
+
+## 🌐 Live Demo
+
+> Coming soon — or host it yourself on a Pi using the instructions below!
 
 ---
 
 ## ✨ Features
 
-- 🌡️ Real-time weather data via OpenWeatherMap API
-- 💻 CPU temperature, uptime, and timestamp
-- ✈️ Live ADS-B aircraft stats from `dump1090-fa`
-- 📊 Historical charts:
-  - Temp / Humidity / Feels Like (Tri-Chart)
-  - Wind Speed
-  - Barometric Pressure
-- 🔐 Secrets and logs excluded from version control
-- 🧠 Auto-refreshing interface (every 2 minutes)
-- 🔋 Built for low-power Raspberry Pi deployments
+- 🌦️ Real-time weather data from OpenWeatherMap
+- 💻 CPU temperature, uptime, and current timestamp
+- ✈️ ADS-B aircraft tracking via `dump1090-fa`
+- 📊 Interactive, historical charts powered by Chart.js:
+  - 🧊 Tri-Chart: Temp, Feels Like, Humidity
+  - 💨 Wind Speed
+  - 📈 Barometric Pressure
+- 🔄 Auto-refreshing every 2 minutes
+- 🔐 Secrets excluded from Git (see `.gitignore`)
+- 📁 Weather logs persist across reboots
 
 ---
 
-## 📁 Project Structure
+## 🧰 Project Structure
 
-```
+```text
 pi-dashboard/
-├── app.py               # Main Flask app
+├── app.py               # Flask app
 ├── dashboard.html       # Templated frontend (Jinja2 + Bootstrap + Chart.js)
-├── config_example.py    # Template for API keys and location
-├── .gitignore           # Excludes secrets, logs, caches
-└── logs/
-    └── weather_log.json # Auto-generated weather history
+├── config_example.py    # Template for secrets (do not commit actual config)
+├── logs/                # Weather data history (auto-generated, ignored by Git)
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-## ⚙️ Setup Instructions
+## ⚙️ Requirements
 
-### 1. 📦 Install Dependencies
+- ✅ Raspberry Pi (tested on Pi 4B)
+- ✅ Python 3.9+
+- ✅ Internet connection
+- ✅ OpenWeatherMap API key
+- Optional: `dump1090-fa` for aircraft tracking
+
+---
+
+## 🔧 Installation
 
 ```bash
 sudo apt update
-sudo apt install python3-pip
+sudo apt install python3-pip git
 pip3 install flask requests
 ```
 
-### 2. 🔑 Add API Key & Location
+Clone this repo:
 
-Create a `config.py`:
-
-```python
-# config.py
-OPENWEATHER_API_KEY = "your_openweathermap_api_key"
-LATITUDE = 33.52960883457356
-LONGITUDE = -81.8343796502794
+```bash
+git clone git@github.com:CharlesJGantt/benchPi-Dashboard.git
+cd benchPi-Dashboard
 ```
-
-> 🔒 **Important:** Never commit `config.py`. It is ignored via `.gitignore`.
 
 ---
 
-### 3. 🚀 Run the App
+## 🔑 Configuration
+
+1. Copy the secrets template:
+
+```bash
+cp config_example.py config.py
+```
+
+2. Edit `config.py` with your location and OpenWeatherMap API key:
+
+```python
+# config.py
+OPENWEATHER_API_KEY = "your_api_key_here"
+LATITUDE = 33.5296
+LONGITUDE = -81.8344
+```
+
+> 🔐 `config.py` is **ignored by Git** to prevent leaking secrets. Do not commit it.
+
+---
+
+## 🚀 Launch the App
+
+From inside the repo folder:
 
 ```bash
 python3 app.py
 ```
 
-Visit in your browser at:  
-➡️ `http://<your-pi-ip>:5000`
+Open your browser to:
+
+```
+http://<your-raspberry-pi-ip>:5000
+```
 
 ---
 
-## 📉 Charting & History
+## 📉 Charting Overview
 
-The app logs each weather update to:
+Weather data is saved to:
+
 ```
 /home/benchpi/pi-dashboard/logs/weather_log.json
 ```
 
-Each chart displays **full historical data** from this file across reboots.
+The dashboard renders this data on each refresh, showing full historical charts:
+
+| Chart Tab        | Data Included                     |
+|------------------|-----------------------------------|
+| 🌡️ Tri-Chart     | Temp, Feels Like, Humidity        |
+| 💨 Wind Speed    | Wind speed (m/s)                  |
+| 📈 Barometric    | Air pressure (hPa)                |
 
 ---
 
-## 🧼 Security Notes
+## 🔐 Security Notes
 
-- Secrets (`config.py`) are **never committed**
-- Logs are stored locally and excluded from Git
-- If you ever leak a key: regenerate it and delete the old one immediately
-
----
-
-## 🧪 Roadmap Ideas
-
-- 📦 Docker support
-- 🔄 Live-updating charts with AJAX or WebSockets
-- 📅 Historical data by day/month/year
-- 🛰️ Map view of tracked aircraft with Leaflet.js
+- All secrets (`config.py`) are excluded via `.gitignore`
+- If a key is accidentally pushed, rotate the key and run:
+  ```bash
+  git filter-branch --force --index-filter \
+    "git rm --cached --ignore-unmatch config.py" \
+    --prune-empty --tag-name-filter cat -- --all
+  git push origin --force
+  ```
 
 ---
 
-## 👨‍💻 Maintainer
+## 🧪 Troubleshooting
 
-Charles Gantt  
-[github.com/CharlesJGantt](https://github.com/CharlesJGantt)  
-[TheMakersWorkbench.com](https://themakersworkbench.com)
+- ❌ **Charts not showing?** Check that `weather_log.json` is being written to `/logs/`
+- ❌ **No weather data?** Verify your OpenWeatherMap API key works
+- ❌ **ADS-B stats empty?** Confirm `dump1090-fa` is installed and running
 
 ---
 
-## 🪪 License
+## 📜 License
 
-MIT — use it, fork it, build on it, just give credit.
+MIT License — use it, modify it, build cool things with it.
+
+---
+
+## 👤 Maintainer
+
+**Charles Gantt**  
+🔗 [charlesjgantt.com](https://charlesjgantt.com)  
+🛠 [TheMakersWorkbench](https://themakersworkbench.com)  
+🐙 [@CharlesJGantt](https://github.com/CharlesJGantt)
+
+---
 ```
