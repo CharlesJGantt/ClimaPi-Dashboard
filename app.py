@@ -1,16 +1,50 @@
-from flask import Flask, render_template
+# app.py (fully fixed with daily/hourly parsing and full logging)
+from flask import Flask, render_template, request
 import os
 import datetime
 import requests
 import json
+import argparse
 from config import OPENWEATHER_API_KEY, LATITUDE, LONGITUDE
-
-os.makedirs("/home/benchpi/pi-dashboard/logs", exist_ok=True)
 
 app = Flask(__name__)
 
-LOG_FILE = "/home/benchpi/pi-dashboard/logs/weather_log.json"
+@app.template_filter("datetime")
+def format_datetime(value):
+    try:
+        return datetime.datetime.fromtimestamp(value).strftime("%Y-%m-%d %H:%M")
+    except:
+        return "N/A"
+
+
+LOG_DIR = "/home/benchpi/pi-dashboard/logs"
+CACHE_FILE = os.path.join(LOG_DIR, "onecall_cache.json")
+LOG_FILE = os.path.join(LOG_DIR, "onecall_log.json")
 MAX_LOG_ENTRIES = 288
+os.makedirs(LOG_DIR, exist_ok=True)
+
+UNIT_MODES = ["imperial", "metric", "scientific", "all"]
+
+def convert_temp(value):
+    return {
+        "imperial": value,
+        "metric": round((value - 32) * 5 / 9, 2),
+        "scientific": round((value - 32) * 5 / 9 + 273.15, 2)
+    }
+
+def convert_pressure(value):
+    return {
+        "imperial": value,
+        "metric": round(value * 33.8639, 2),
+        "scientific": round(value * 3386.39, 2)
+    }
+
+def convert_wind(value):
+    return {
+        "imperial": value,
+        "metric": round(value * 1.60934, 2),
+        "scientific": round(value * 0.44704, 2)
+    }
 
 def get_sysinfo():
     temp = os.popen("vcgencmd measure_temp").readline().replace("temp=", "")
@@ -20,6 +54,14 @@ def get_sysinfo():
         "uptime": uptime.strip(),
         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
+
+def format_unix(ts):
+    return datetime.datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S") if ts else "N/A"
+
+def wind_dir_to_cardinal(deg):
+    dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
+    ix = int((deg + 22.5) / 45) % 8
+    return dirs[ix] if deg is not None else "N/A"
 
 def log_weather(entry):
     try:
@@ -34,6 +76,121 @@ def log_weather(entry):
             json.dump(log, f)
     except Exception as e:
         print("❗ Error logging weather:", e)
+
+def fetch_onecall():
+    url = f"https://api.openweathermap.org/data/3.0/onecall?lat={LATITUDE}&lon={LONGITUDE}&units=imperial&exclude=minutely&appid={OPENWEATHER_API_KEY}"
+    try:
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f"❌ Error {response.status_code}: {response.text}")
+            return
+        data = response.json()
+
+        current = data.get("current", {})
+        daily = data.get("daily", [])
+        hourly = data.get("hourly", [])
+        alerts = data.get("alerts", [])
+
+        entry = {
+            "time": datetime.datetime.now().strftime("%H:%M"),
+            "temp": current.get("temp"),
+            "feels_like": current.get("feels_like"),
+            "humidity": current.get("humidity"),
+            "wind_speed": current.get("wind_speed"),
+            "pressure": current.get("pressure")
+        }
+        log_weather(entry)
+
+        cached = load_cached_weather()
+        cached["current"] = {
+            "temp": convert_temp(current.get("temp")),
+            "feels_like": convert_temp(current.get("feels_like")),
+            "pressure": convert_pressure(current.get("pressure")),
+            "humidity": current.get("humidity"),
+            "wind_speed": convert_wind(current.get("wind_speed")),
+            "wind_deg": current.get("wind_deg"),
+            "wind_cardinal": wind_dir_to_cardinal(current.get("wind_deg")),
+            "uvi": current.get("uvi"),
+            "visibility": current.get("visibility"),
+            "clouds": current.get("clouds"),
+            "dew_point": convert_temp(current.get("dew_point")),
+            "weather": current.get("weather", [{}])[0],
+            "sunrise": format_unix(current.get("sunrise")),
+            "sunset": format_unix(current.get("sunset"))
+        }
+
+        cached["daily"] = [
+            {
+                "date": datetime.datetime.fromtimestamp(d["dt"]).strftime("%a %b %d"),
+                "temp": {
+                    "min": d["temp"]["min"],
+                    "max": d["temp"]["max"]
+                },
+                "humidity": d["humidity"],
+                "clouds": d["clouds"],
+                "uvi": d["uvi"],
+                "wind_speed": d["wind_speed"],
+                "wind_cardinal": wind_dir_to_cardinal(d.get("wind_deg")),
+                "description": d["weather"][0]["description"],
+                "icon": d["weather"][0]["icon"]
+            } for d in daily
+        ]
+
+        cached["hourly"] = [
+            {
+                "time": datetime.datetime.fromtimestamp(h["dt"]).strftime("%H:%M"),
+                "temp": h["temp"],
+                "humidity": h["humidity"],
+                "wind_speed": h["wind_speed"],
+                "wind_cardinal": wind_dir_to_cardinal(h.get("wind_deg")),
+                "clouds": h["clouds"],
+                "rain": h.get("rain", {}).get("1h", 0),
+                "uvi": h.get("uvi", 0),
+                "icon": h["weather"][0]["icon"],
+                "description": h["weather"][0]["description"]
+            } for h in hourly[:48]
+        ]
+
+        cached["alerts"] = alerts
+
+        with open(CACHE_FILE, "w") as f:
+            json.dump(cached, f)
+
+        print("✅ fetch_onecall: cache updated with current, daily, hourly, alerts")
+
+    except Exception as e:
+        print("❗ Error fetching onecall:", e)
+
+def fetch_overview():
+    url = f"https://api.openweathermap.org/data/3.0/onecall/overview?lat={LATITUDE}&lon={LONGITUDE}&units=imperial&appid={OPENWEATHER_API_KEY}"
+    try:
+        overview = requests.get(url).json().get("weather_overview", "")
+        cached = load_cached_weather()
+        cached["overview"] = overview
+        with open(CACHE_FILE, "w") as f:
+            json.dump(cached, f)
+    except Exception as e:
+        print("❗ Error fetching overview:", e)
+
+def fetch_day_summary():
+    date = datetime.datetime.now().strftime("%Y-%m-%d")
+    url = f"https://api.openweathermap.org/data/3.0/onecall/day_summary?lat={LATITUDE}&lon={LONGITUDE}&date={date}&units=imperial&appid={OPENWEATHER_API_KEY}"
+    try:
+        data = requests.get(url).json()
+        summary = {
+            "temperature": data.get("temperature"),
+            "humidity": data.get("humidity", {}).get("afternoon"),
+            "pressure": data.get("pressure", {}).get("afternoon"),
+            "precipitation": data.get("precipitation", {}).get("total"),
+            "cloud_cover": data.get("cloud_cover", {}).get("afternoon"),
+            "wind": data.get("wind", {}).get("max")
+        }
+        cached = load_cached_weather()
+        cached["summary"] = summary
+        with open(CACHE_FILE, "w") as f:
+            json.dump(cached, f)
+    except Exception as e:
+        print("❗ Error fetching day summary:", e)
 
 def load_weather_data():
     try:
@@ -50,50 +207,41 @@ def load_weather_data():
         print("❗ Failed to load chart data:", e)
         return [], [], [], [], [], []
 
-def get_weather():
-    url = f"https://api.openweathermap.org/data/2.5/weather?lat={LATITUDE}&lon={LONGITUDE}&units=metric&appid={OPENWEATHER_API_KEY}"
+def load_cached_weather():
     try:
-        response = requests.get(url)
-        data = response.json()
-        weather = {
-            "city": data["name"],
-            "country": data["sys"]["country"],
-            "temp": data["main"]["temp"],
-            "feels_like": data["main"]["feels_like"],
-            "humidity": data["main"]["humidity"],
-            "pressure": data["main"]["pressure"],
-            "visibility": data.get("visibility", "N/A"),
-            "wind_speed": data["wind"].get("speed", "N/A"),
-            "wind_deg": data["wind"].get("deg", "N/A"),
-            "wind_gust": data["wind"].get("gust", "N/A"),
-            "condition_main": data["weather"][0]["main"],
-            "condition_desc": data["weather"][0]["description"].title(),
-            "icon": data["weather"][0]["icon"],
-            "sunrise": datetime.datetime.fromtimestamp(data["sys"]["sunrise"]).strftime('%H:%M:%S'),
-            "sunset": datetime.datetime.fromtimestamp(data["sys"]["sunset"]).strftime('%H:%M:%S'),
-            "is_thunderstorm": "thunderstorm" in data["weather"][0]["description"].lower()
-        }
-
-        log_weather({
-            "time": datetime.datetime.now().strftime("%H:%M"),
-            "temp": weather["temp"],
-            "feels_like": weather["feels_like"],
-            "humidity": weather["humidity"],
-            "wind_speed": weather["wind_speed"],
-            "pressure": weather["pressure"]
-        })
-
-        return weather
+        if os.path.exists(CACHE_FILE):
+            with open(CACHE_FILE, "r") as f:
+                return json.load(f)
+        return {}
     except Exception as e:
-        return {"error": str(e)}
+        return {}
 
 @app.route("/")
 def index():
     info = get_sysinfo()
-    weather = get_weather()
+    weather = load_cached_weather()
     labels, temps, feels, hums, wind, pressure = load_weather_data()
-    return render_template("dashboard.html", info=info, weather=weather, labels=labels,
-                           temps=temps, feels=feels, hums=hums, wind=wind, pressure=pressure)
+    units = request.args.get("units", "imperial")
+    if units not in UNIT_MODES:
+        units = "imperial"
+    return render_template("dashboard.html", info=info, weather=weather, labels=labels, temps=temps,
+                           feels=feels, hums=hums, wind=wind, pressure=pressure, units=units)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--onecall", action="store_true", help="Fetch onecall weather data")
+    parser.add_argument("--overview", action="store_true", help="Fetch AI overview")
+    parser.add_argument("--summary", action="store_true", help="Fetch day summary")
+    parser.add_argument("--serve", action="store_true", help="Run Flask web server")
+    args = parser.parse_args()
+
+    if args.onecall:
+        fetch_onecall()
+    elif args.overview:
+        fetch_overview()
+    elif args.summary:
+        fetch_day_summary()
+    elif args.serve:
+        app.run(host="0.0.0.0", port=5000, debug=True)
+    else:
+        parser.print_help()

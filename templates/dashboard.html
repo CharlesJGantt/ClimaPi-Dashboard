@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="refresh" content="120">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pi Dashboard</title>
+  <title>Pi Weather Dashboard</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -12,59 +12,211 @@
   <div class="container mt-4">
     <h1 class="mb-4">🖥 Pi System Dashboard</h1>
 
-    <!-- System Info -->
+    <!-- Unit Toggle -->
+    <div class="mb-4">
+      <div class="btn-group" role="group">
+        {% for mode in ['imperial', 'metric', 'scientific', 'all'] %}
+          <a href="?units={{ mode }}" class="btn btn-outline-light {% if units == mode %}active{% endif %}">{{ mode.title() }}</a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Current Weather -->
+{% if weather.current %}
+<div class="card bg-dark border-secondary mb-4">
+  <div class="card-header text-light fs-4">🌤️ Current Weather</div>
+  <div class="card-body text-light">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item bg-dark text-light">
+        🌡 Temp:
+        {% if units == 'all' %}
+          {{ weather.current.temp.imperial }}°F / {{ weather.current.temp.metric }}°C / {{ weather.current.temp.scientific }}K
+        {% else %}
+          {{ weather.current.temp[units] }} {{ '°F' if units == 'imperial' else '°C' if units == 'metric' else 'K' }}
+        {% endif %}<br>
+        Feels like:
+        {% if units == 'all' %}
+          {{ weather.current.feels_like.imperial }}°F / {{ weather.current.feels_like.metric }}°C / {{ weather.current.feels_like.scientific }}K
+        {% else %}
+          {{ weather.current.feels_like[units] }} {{ '°F' if units == 'imperial' else '°C' if units == 'metric' else 'K' }}
+        {% endif %}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        📈 Pressure:
+        {% if units == 'all' %}
+          {{ weather.current.pressure.imperial }} inHg / {{ weather.current.pressure.metric }} hPa / {{ weather.current.pressure.scientific }} Pa
+        {% else %}
+          {{ weather.current.pressure[units] }} {{ 'inHg' if units == 'imperial' else 'hPa' if units == 'metric' else 'Pa' }}
+        {% endif %}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        💧 Humidity: {{ weather.current.humidity }}%
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        💨 Wind:
+        {% if units == 'all' %}
+          {{ weather.current.wind_speed.imperial }} mph / {{ weather.current.wind_speed.metric }} km/h / {{ weather.current.wind_speed.scientific }} m/s
+        {% else %}
+          {{ weather.current.wind_speed[units] }} {{ 'mph' if units == 'imperial' else 'km/h' if units == 'metric' else 'm/s' }}
+        {% endif %} from {{ weather.current.wind_cardinal }}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        ☁️ Cloud Cover: {{ weather.current.clouds }}% | ☀️ UVI: {{ weather.current.uvi }}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        👁️ Visibility: {{ weather.current.visibility }} meters
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        🌅 Sunrise: {{ weather.current.sunrise }} | 🌇 Sunset: {{ weather.current.sunset }}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        🌡 Dew Point:
+        {% if units == 'all' %}
+          {{ weather.current.dew_point.imperial }}°F / {{ weather.current.dew_point.metric }}°C / {{ weather.current.dew_point.scientific }}K
+        {% else %}
+          {{ weather.current.dew_point[units] }} {{ '°F' if units == 'imperial' else '°C' if units == 'metric' else 'K' }}
+        {% endif %}
+      </li>
+      <li class="list-group-item bg-dark text-light">
+        🌦 Description: {{ weather.current.weather.description.title() }}
+      </li>
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<!-- System Info -->
     <div class="card bg-dark border-secondary mb-4">
-      <div class="card-body">
-        <h5 class="card-title">📊 System Info</h5>
+      <div class="card-body text-light">
+        <h5 class="card-title">🧠 System Info</h5>
         <ul class="list-group list-group-flush">
-          <li class="list-group-item bg-secondary text-light">🌡 CPU Temp: {{ info.cpu_temp }}</li>
-          <li class="list-group-item bg-secondary text-light">🕒 Uptime: {{ info.uptime }}</li>
-          <li class="list-group-item bg-secondary text-light">📅 Timestamp: {{ info.timestamp }}</li>
+          <li class="list-group-item bg-dark text-light">Uptime: {{ info.uptime }}</li>
+          <li class="list-group-item bg-dark text-light">CPU Temp: {{ info.cpu_temp }}</li>
+          <li class="list-group-item bg-dark text-light">Last Updated: {{ info.timestamp }}</li>
         </ul>
       </div>
     </div>
 
-    <!-- Weather Info -->
-    <h2 class="mt-5">🌦️ Outdoor Weather</h2>
-    {% if weather.error %}
-      <div class="alert alert-danger">❗ Weather API Error: {{ weather.error }}</div>
-    {% else %}
-    <div class="card bg-dark text-light mb-4">
-      <div class="card-header">📍 {{ weather.city }}, {{ weather.country }}</div>
+    <!-- Weather Overview -->
+    {% if weather.overview %}
+    <div class="card bg-dark border-secondary mb-4">
+      <div class="card-header text-light fs-4">📖 Weather Overview</div>
+      <div class="card-body text-light">
+        <p>{{ weather.overview }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Alerts -->
+    {% if weather.alerts %}
+    <div class="card bg-danger text-white border-light mb-4">
+      <div class="card-header text-light fs-4">🚨 Weather Alerts</div>
+      <div class="card-body">
+        {% for alert in weather.alerts %}
+        <div class="mb-3">
+          <strong>{{ alert.event }}</strong> <small class="text-muted">({{ alert.sender_name }})</small><br>
+          From: {{ alert.start | datetime }} To: {{ alert.end | datetime }}<br>
+          <em>{{ alert.description }}</em><br>
+          Tags: {{ alert.tags | join(', ') }}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Daily Summary -->
+    {% if weather.summary %}
+    <div class="card bg-dark border-secondary mb-4">
+      <div class="card-header text-light fs-4">📆 Daily Summary</div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-dark text-light">Temperature Range: {{ weather.summary.temperature.min }} - {{ weather.summary.temperature.max }}</li>
+          <li class="list-group-item bg-dark text-light">Humidity (Afternoon): {{ weather.summary.humidity }}%</li>
+          <li class="list-group-item bg-dark text-light">Pressure (Afternoon): {{ weather.summary.pressure }} hPa</li>
+          <li class="list-group-item bg-dark text-light">Precipitation Total: {{ weather.summary.precipitation }} mm</li>
+          <li class="list-group-item bg-dark text-light">Cloud Cover (Afternoon): {{ weather.summary.cloud_cover }}%</li>
+          <li class="list-group-item bg-dark text-light">Max Wind: {{ weather.summary.wind.speed }} m/s ({{ weather.summary.wind.direction }}°)</li>
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Daily Forecast -->
+    {% if weather.daily %}
+    <div class="card bg-dark border-secondary mb-4">
+      <div class="card-header text-light fs-4">📅 8-Day Forecast</div>
       <div class="card-body">
         <div class="row">
-          <div class="col-md-4 text-center">
-            <img src="https://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" alt="Weather Icon">
-            <p><strong>{{ weather.condition_main }}</strong><br>{{ weather.condition_desc }}</p>
+          {% for day in weather.daily %}
+          <div class="col-md-6 col-lg-4 mb-3">
+            <div class="border p-3 rounded bg-secondary text-light">
+              <strong>{{ day.date }}</strong><br>
+              <img src="https://openweathermap.org/img/wn/{{ day.icon }}@2x.png" alt="{{ day.description }}" class="mb-2" title="{{ day.description }}"><br>
+              🌡 {{ day.temp.min }}°F - {{ day.temp.max }}°F<br>
+              💧 {{ day.humidity }}% humidity<br>
+              🌤 {{ day.description.title() }}<br>
+              💨 {{ day.wind_speed }} mph {{ day.wind_cardinal }}<br>
+              ☁️ Cloud: {{ day.clouds }}%, UVI: {{ day.uvi }}
+            </div>
           </div>
-          <div class="col-md-8">
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item bg-secondary text-light">🌡️ Temp: {{ weather.temp }} °C (Feels like: {{ weather.feels_like }} °C)</li>
-              <li class="list-group-item bg-secondary text-light">💧 Humidity: {{ weather.humidity }}%</li>
-              <li class="list-group-item bg-secondary text-light">📈 Pressure: {{ weather.pressure }} hPa</li>
-              <li class="list-group-item bg-secondary text-light">💨 Wind: {{ weather.wind_speed }} m/s at {{ weather.wind_deg }}°</li>
-              <li class="list-group-item bg-secondary text-light">🌅 Sunrise: {{ weather.sunrise }} | 🌇 Sunset: {{ weather.sunset }}</li>
-              {% if weather.is_thunderstorm %}
-              <li class="list-group-item bg-danger text-light">⚡ <strong>Thunderstorm Detected!</strong></li>
-              {% endif %}
-            </ul>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
     {% endif %}
 
-    <!-- Chart Tabs -->
+    <!-- Hourly Forecast -->
+    {% if weather.hourly %}
+    <div class="card bg-dark border-secondary mb-4">
+      <div class="card-header text-light fs-4">⏱️ Next 48 Hours</div>
+      <div class="card-body overflow-auto" style="max-height: 400px;">
+        <table class="table table-sm table-striped text-light">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Temp</th>
+              <th>Humidity</th>
+              <th>Wind</th>
+              <th>Clouds</th>
+              <th>Rain</th>
+              <th>UVI</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in weather.hourly %}
+            <tr>
+              {% set hour = h.time.split(' ')[0]|int %}
+              <td>
+                <img src="https://openweathermap.org/img/wn/{{ h.icon }}.png" alt="icon" width="30" class="me-2"
+                     style="filter: brightness({{ '0.9' if 6 <= hour <= 18 else '0.4' }});"
+                     title="{{ h.description }}">
+                {{ h.time }}
+              </td>
+              <td>{{ h.temp }}°F</td>
+              <td>{{ h.humidity }}%</td>
+              <td>{{ h.wind_speed }} mph {{ h.wind_cardinal }}</td>
+              <td>{{ h.clouds }}%</td>
+              <td>{{ h.rain }} mm</td>
+              <td>{{ h.uvi }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Charts -->
     <h2 class="mt-5">📈 Weather Trends</h2>
     <ul class="nav nav-tabs mb-3" id="chartTabs" role="tablist">
       <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="tri-tab" data-bs-toggle="tab" data-bs-target="#tri" type="button" role="tab">🌡️ Tri-Chart</button>
+        <button class="nav-link active" id="tri-tab" data-bs-toggle="tab" data-bs-target="#tri" type="button" role="tab">🌡️ Temp/Humidity</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="wind-tab" data-bs-toggle="tab" data-bs-target="#wind" type="button" role="tab">💨 Wind Speed</button>
+        <button class="nav-link" id="wind-tab" data-bs-toggle="tab" data-bs-target="#wind" type="button" role="tab">💨 Wind</button>
       </li>
       <li class="nav-item" role="presentation">
-        <button class="nav-link" id="pressure-tab" data-bs-toggle="tab" data-bs-target="#pressure" type="button" role="tab">📈 Barometric Pressure</button>
+        <button class="nav-link" id="pressure-tab" data-bs-toggle="tab" data-bs-target="#pressure" type="button" role="tab">📈 Pressure</button>
       </li>
     </ul>
     <div class="tab-content">
@@ -82,7 +234,6 @@
     <footer class="text-muted mt-5 mb-3 text-center">Built with Flask on Raspberry Pi</footer>
   </div>
 
-  <!-- Chart JS -->
   <script>
     const labels = {{ labels | tojson }};
     const temps = {{ temps | tojson }};
@@ -96,8 +247,8 @@
       data: {
         labels: labels,
         datasets: [
-          { label: 'Temp (°C)', data: temps, borderColor: 'orange', fill: false },
-          { label: 'Feels Like (°C)', data: feels, borderColor: 'red', fill: false },
+          { label: 'Temp (°F)', data: temps, borderColor: 'orange', fill: false },
+          { label: 'Feels Like (°F)', data: feels, borderColor: 'red', fill: false },
           { label: 'Humidity (%)', data: hums, borderColor: 'blue', fill: false }
         ]
       },
@@ -111,7 +262,7 @@
       type: 'line',
       data: {
         labels: labels,
-        datasets: [{ label: 'Wind Speed (m/s)', data: wind, borderColor: 'aqua', fill: false }]
+        datasets: [{ label: 'Wind Speed (mph)', data: wind, borderColor: 'aqua', fill: false }]
       },
       options: {
         plugins: { legend: { labels: { color: 'white' } } },
@@ -123,7 +274,7 @@
       type: 'line',
       data: {
         labels: labels,
-        datasets: [{ label: 'Pressure (hPa)', data: pressure, borderColor: 'lime', fill: false }]
+        datasets: [{ label: 'Pressure (inHg)', data: pressure, borderColor: 'lime', fill: false }]
       },
       options: {
         plugins: { legend: { labels: { color: 'white' } } },
@@ -132,7 +283,6 @@
     });
   </script>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
