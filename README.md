@@ -175,8 +175,8 @@ Description=ClimaPi Dashboard Web Server
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/python3 /home/pi/ClimaPi-Dashboard/app.py --serve
-WorkingDirectory=/home/pi/ClimaPi-Dashboard
+ExecStart=/usr/bin/python3 /home/ClimaPi/app.py --serve
+WorkingDirectory=/home/ClimaPi
 Restart=always
 User=pi
 Environment=PYTHONUNBUFFERED=1
