@@ -21,6 +21,17 @@
       </div>
     </div>
 
+    <!-- System Info -->
+    <div class="card bg-dark border-secondary mb-4">
+      <div class="card-body text-light">
+        <h5 class="card-title">🧠 System Info</h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item bg-dark text-light">Uptime: {{ info.uptime }}</li>
+          <li class="list-group-item bg-dark text-light">CPU Temp: {{ info.cpu_temp }}</li>
+          <li class="list-group-item bg-dark text-light">Last Updated: {{ info.timestamp }}</li>
+        </ul>
+      </div>
+    </div>
     <!-- Current Weather -->
 {% if weather.current %}
 <div class="card bg-dark border-secondary mb-4">
@@ -84,18 +95,6 @@
   </div>
 </div>
 {% endif %}
-
-<!-- System Info -->
-    <div class="card bg-dark border-secondary mb-4">
-      <div class="card-body text-light">
-        <h5 class="card-title">🧠 System Info</h5>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item bg-dark text-light">Uptime: {{ info.uptime }}</li>
-          <li class="list-group-item bg-dark text-light">CPU Temp: {{ info.cpu_temp }}</li>
-          <li class="list-group-item bg-dark text-light">Last Updated: {{ info.timestamp }}</li>
-        </ul>
-      </div>
-    </div>
 
     <!-- Weather Overview -->
     {% if weather.overview %}
@@ -230,8 +229,6 @@
         <canvas id="pressureChart"></canvas>
       </div>
     </div>
-
-    <footer class="text-muted mt-5 mb-3 text-center">Built with Flask on Raspberry Pi</footer>
   </div>
 
   <script>
@@ -285,4 +282,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+<footer class="text-light mt-5 mb-3 text-center small">
+  👨‍💻 Developed by <a href="https://www.charlesjgantt.com" target="_blank">Charles Gantt</a> &amp; <a href="https://www.themakersworkbench.com" target="_blank">TheMakersWorkbench.com</a> |
+  📦 Built with <a href="https://flask.palletsprojects.com/" target="_blank">Flask</a> on a <a href="https://www.raspberrypi.com/" target="_blank">Raspberry Pi</a> |
+  📜 Licensed under <a href="https://choosealicense.com/licenses/mit/" target="_blank">MIT License</a> |
+  💾 <a href="https://github.com/CharlesJGantt/ClimaPi-Dashboard" target="_blank">View on GitHub</a> |
+  ☕ <a href="https://buy.stripe.com/9AQ16L7PwfCieZOaEF" target="_blank">Buy Me a Coffee</a>
+</footer>
+
 </html>

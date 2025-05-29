@@ -248,6 +248,6 @@ if __name__ == "__main__":
     elif args.summary:
         fetch_day_summary()
     elif args.serve:
-        app.run(host="0.0.0.0", port=5000, debug=True)
+        app.run(host="0.0.0.0", port=5000, debug=False)
     else:
         parser.print_help()
