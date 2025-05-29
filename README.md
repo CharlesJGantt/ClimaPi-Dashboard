@@ -78,6 +78,39 @@ pip install flask requests
 
 Use the method that best suits your setup. The virtual environment approach is ideal for development, while the system-wide method is simpler for lightweight or single-use deployments.
 
+### 🔑 Getting Your OpenWeatherMap API Key
+
+To fetch live weather data, ClimaPi Dashboard uses the [OpenWeatherMap API](https://openweathermap.org/api). You'll need to sign up for a free API key to get started.
+
+#### 🪜 Steps to Obtain Your API Key:
+
+1.  **Create an Account**  
+    Visit https://home.openweathermap.org/users/sign_up and create a free account.
+2.  **Generate an API Key**  
+    After logging in, go to the **API Keys** tab in your dashboard or directly to https://home.openweathermap.org/api_keys.  
+    Click **"Create Key"**, give it a name (e.g., `ClimaPi`), and copy the generated key.
+3.  **Activate Your Key**  
+    It may take several minutes for a new key to become active.
+4.  **Add Your Key to the Project**  
+    Open the `config.py` file and replace the placeholder with your actual key:
+    
+    python
+    
+    CopyEdit
+    
+    `OPENWEATHERMAP_API_KEY = "your_api_key_here"` 
+    
+    🔐 _Tip: For added security, consider loading your API key from an environment variable instead of hardcoding it._
+    
+
+#### 📌 Free Tier Limits & Billing Notes
+
+*   The free tier includes **1,000 API calls per day**.
+*   OpenWeatherMap may require a credit card on file to **enable API access**, even if you stay within the free tier limits.
+*   **No charges will occur** as long as your usage stays below the 1,000 daily call limit — which ClimaPi is optimized to do.
+
+✅ The dashboard is designed to **stay under 950 calls/day** by default, keeping you comfortably within the free tier.
+
 ### Installation
 
 Once your dependencies are installed (see [Prerequisites](https://chatgpt.com/g/g-p-68349e2db43081918f3da71cebfd853a-tmwb-benchpi-project/c/6837cde8-bd00-8003-abf3-5f55195f8ebb#prerequisites)), you're ready to set up ClimaPi Dashboard.
