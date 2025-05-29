@@ -1,10 +1,11 @@
-# app.py (fully fixed with daily/hourly parsing and full logging)
+# app.py (ClimaPi Dashboard - fully portable with relative paths, daily/hourly parsing and full logging)
 from flask import Flask, render_template, request
 import os
 import datetime
 import requests
 import json
 import argparse
+import pathlib
 from config import OPENWEATHER_API_KEY, LATITUDE, LONGITUDE
 
 app = Flask(__name__)
@@ -16,10 +17,10 @@ def format_datetime(value):
     except:
         return "N/A"
 
-
-LOG_DIR = "/home/benchpi/pi-dashboard/logs"
-CACHE_FILE = os.path.join(LOG_DIR, "onecall_cache.json")
-LOG_FILE = os.path.join(LOG_DIR, "onecall_log.json")
+BASE_DIR = pathlib.Path(__file__).resolve().parent
+LOG_DIR = BASE_DIR / "logs"
+CACHE_FILE = LOG_DIR / "onecall_cache.json"
+LOG_FILE = LOG_DIR / "onecall_log.json"
 MAX_LOG_ENTRIES = 288
 os.makedirs(LOG_DIR, exist_ok=True)
 
@@ -66,13 +67,13 @@ def wind_dir_to_cardinal(deg):
 def log_weather(entry):
     try:
         if os.path.exists(LOG_FILE):
-            with open(LOG_FILE, "r") as f:
+            with open(str(LOG_FILE), "r") as f:
                 log = json.load(f)
         else:
             log = []
         log.append(entry)
         log = log[-MAX_LOG_ENTRIES:]
-        with open(LOG_FILE, "w") as f:
+        with open(str(LOG_FILE), "w") as f:
             json.dump(log, f)
     except Exception as e:
         print("❗ Error logging weather:", e)
@@ -153,7 +154,7 @@ def fetch_onecall():
 
         cached["alerts"] = alerts
 
-        with open(CACHE_FILE, "w") as f:
+        with open(str(CACHE_FILE), "w") as f:
             json.dump(cached, f)
 
         print("✅ fetch_onecall: cache updated with current, daily, hourly, alerts")
@@ -167,7 +168,7 @@ def fetch_overview():
         overview = requests.get(url).json().get("weather_overview", "")
         cached = load_cached_weather()
         cached["overview"] = overview
-        with open(CACHE_FILE, "w") as f:
+        with open(str(CACHE_FILE), "w") as f:
             json.dump(cached, f)
     except Exception as e:
         print("❗ Error fetching overview:", e)
@@ -178,23 +179,26 @@ def fetch_day_summary():
     try:
         data = requests.get(url).json()
         summary = {
-            "temperature": data.get("temperature"),
-            "humidity": data.get("humidity", {}).get("afternoon"),
-            "pressure": data.get("pressure", {}).get("afternoon"),
-            "precipitation": data.get("precipitation", {}).get("total"),
-            "cloud_cover": data.get("cloud_cover", {}).get("afternoon"),
-            "wind": data.get("wind", {}).get("max")
-        }
+    "temperature": data.get("temperature"),
+    "humidity": data.get("humidity", {}).get("afternoon"),
+    "pressure": data.get("pressure", {}).get("afternoon"),
+    "precipitation": data.get("precipitation", {}).get("total"),
+    "cloud_cover": data.get("cloud_cover", {}).get("afternoon"),
+    "wind": {
+        "speed": data.get("wind", {}).get("max", {}).get("speed"),
+        "direction": data.get("wind", {}).get("max", {}).get("direction")
+    }
+}
         cached = load_cached_weather()
         cached["summary"] = summary
-        with open(CACHE_FILE, "w") as f:
+        with open(str(CACHE_FILE), "w") as f:
             json.dump(cached, f)
     except Exception as e:
         print("❗ Error fetching day summary:", e)
 
 def load_weather_data():
     try:
-        with open(LOG_FILE, "r") as f:
+        with open(str(LOG_FILE), "r") as f:
             log = json.load(f)
         labels = [entry["time"] for entry in log]
         temps = [entry["temp"] for entry in log]
@@ -210,7 +214,7 @@ def load_weather_data():
 def load_cached_weather():
     try:
         if os.path.exists(CACHE_FILE):
-            with open(CACHE_FILE, "r") as f:
+            with open(str(CACHE_FILE), "r") as f:
                 return json.load(f)
         return {}
     except Exception as e:
@@ -220,6 +224,8 @@ def load_cached_weather():
 def index():
     info = get_sysinfo()
     weather = load_cached_weather()
+    print("🔎 Weather keys:", list(weather.keys()))
+
     labels, temps, feels, hums, wind, pressure = load_weather_data()
     units = request.args.get("units", "imperial")
     if units not in UNIT_MODES:
