@@ -9,8 +9,7 @@
 
 A self-hosted weather visualization tool for Raspberry Pi that displays real-time conditions, forecasts, and historical data using OpenWeatherMap API, Flask, and Chart.js—all accessible through a sleek local web dashboard.
 
-###   
-About The Project
+### About The Project
 
 ClimaPi Dashboard is a fully self-hosted weather visualization tool built for Raspberry Pi and similar Linux-based microcomputers. It offers real-time weather monitoring, multi-day forecasting, and rich historical logging through a sleek, browser-accessible dashboard.
 
