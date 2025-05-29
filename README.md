@@ -8,6 +8,9 @@
 ## ClimaPi Dashboard
 
 ![Image](https://github.com/user-attachments/assets/bad1edca-66a3-4169-a18e-641ba2fa94dd)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/bad1edca-66a3-4169-a18e-641ba2fa94dd" alt="ClimaPi Dashboard Screenshot" width="400"> 
+</p>
 
 A self-hosted weather visualization tool for Raspberry Pi that displays real-time conditions, forecasts, and historical data using OpenWeatherMap API, Flask, and Chart.js—all accessible through a sleek local web dashboard.
 
