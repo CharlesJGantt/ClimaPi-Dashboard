@@ -7,7 +7,6 @@
 
 ## ClimaPi Dashboard
 
-![Image](https://github.com/user-attachments/assets/bad1edca-66a3-4169-a18e-641ba2fa94dd)
 <p align="center">
   <img src="https://github.com/user-attachments/assets/bad1edca-66a3-4169-a18e-641ba2fa94dd" alt="ClimaPi Dashboard Screenshot" width="400"> 
 </p>
