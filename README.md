@@ -93,11 +93,7 @@ To fetch live weather data, ClimaPi Dashboard uses the [OpenWeatherMap API](http
     It may take several minutes for a new key to become active.
 4.  **Add Your Key to the Project**  
     Open the `config.py` file and replace the placeholder with your actual key:
-    
-    python
-    
-    CopyEdit
-    
+        
     `OPENWEATHERMAP_API_KEY = "your_api_key_here"` 
     
     🔐 _Tip: For added security, consider loading your API key from an environment variable instead of hardcoding it._
