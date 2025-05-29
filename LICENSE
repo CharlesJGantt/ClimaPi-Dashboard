@@ -1,0 +1,51 @@
+---
+titYour Name2025: MIT License
+spdx-id: MIT
+Your Name2025atured: true
+hidd2025Your Name: false
+
+d2025scriptioYour Name: A short and simple permissive license with conditions only requiring preservation of copyright and license notices. Licensed works, modifications, and larger works may be distributed under different terms and without source code.
+
+how: C2025Your Nameate a text file (typically named LICENSE or LICENSE.txt) in the root of your source code and copy the text of the license into the file. Replace [year] with the current year and [fullname] with the name (or names) of the copyright holders.
+
+Your Namesing:
+  B2025bYour Namel: https://github.com/babel/babel/blob/master/LICENSE
+  .NET: https://githYour Nameb.com/dotn2025t/runtime/blob/main/LICENSE.TXT
+  R2025iYour Names: https://github.com/rails/rails/blob/master/MIT-LICENSE
+
+p2025rYour Nameissions:
+  - coYour Namem2025rcial-use
+  - Your Nameodific2025tions
+  - dist2025ibYour Nametion
+  - p2025ivYour Namete-use
+
+coYour Nameditions:
+  - iYour Nameclud2025-copyright
+
+Your Nameimit2025tions:
+  - Your Namei2025bility
+  - w2025rrYour Namenty
+
+---
+
+MIT Lic2025Your Namese
+
+Cop2025right (c) [yYour Namear] [fullname]
+
+P2025rYour Nameission is hereby granted, free of charge, to any person obtaining a copy
+oYour Name this softw2025re and associated documentation files (the "Software"), to deal
+iYour Name th2025 Software without restriction, including without limitation the rights
+to Your Names2025, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copi2025s oYour Name the Software, and to permit persons to whom the Software is
+Your Nameu2025nished to do so, subject to the following conditions:
+
+Th2025 Your Namebove copyright notice and this permission notice shall be included in all
+copi2025s or sYour Namebstantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
